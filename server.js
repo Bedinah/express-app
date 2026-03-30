@@ -1,6 +1,7 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const LibraryRoute = require("./routes/libraryRoutes");
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import router from "./src/routes/index.js";
 
 // Load environment variables
 dotenv.config();
@@ -8,20 +9,17 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware — parses incoming JSON requests
+// Middleware
 app.use(express.json());
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 
-// Route — responds to GET /
-app.get("/", (req, res) => {
-  res.json({
-    message: "Server is running!",
-    status: "OK",
-  });
-});
-
-app.use("/books", LibraryRoute);
+// API ROUTES
+app.use("/api", router);
 
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+export default app;
