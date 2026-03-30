@@ -24,9 +24,18 @@ const allBooks = [
   },
 ];
 
-// get all
+// get all with optional status filter
 LibraryRoutes.get("/", (req, res) => {
-  res.json(allBooks);
+  const statusFilter = req.query.status;
+
+  if (statusFilter) {
+    const filteredBooks = allBooks.filter((b) => b.status === statusFilter);
+    return res
+      .status(200)
+      .json({ message: "Retrieved successful", filteredBooks });
+  }
+
+  res.json({ message: "All books retrieved successfully", books: allBooks });
 });
 
 // get one
@@ -34,19 +43,7 @@ LibraryRoutes.get("/:id", (req, res) => {
   const book = allBooks.find((b) => b.id === parseInt(req.params.id));
 
   if (!book) {
-    res.status(404).json({ message: "This book is not available" });
-  }
-  res.status(200).json({ message: "Retrieved successful", book });
-});
-
-// get by status
-LibraryRoutes.get("/:status", (req, res) => {
-  const book = allBooks.filter((b) => b.status === req.params.status);
-
-  if (!book) {
-    res
-      .status(404)
-      .json({ message: "No books available with the specified status" });
+    return res.status(404).json({ message: "This book is not available" });
   }
   res.status(200).json({ message: "Retrieved successful", book });
 });
@@ -57,22 +54,21 @@ LibraryRoutes.post("/", (req, res) => {
     id: allBooks.length + 1,
     name: req.body.name,
     author: req.body.author,
-    status: req.body.status,
+    status: "available",
   };
   allBooks.push(newBook);
-  res.status(200).json({ message: "Book added successfully", newBook });
+  res.status(201).json({ message: "Book added successfully", newBook });
 });
 
-// borrow a book
-LibraryRoutes.put("/:id", (req, res) => {
-  /**body */
+// Update a book , update status to borrow/return
+LibraryRoutes.patch("/:id", (req, res) => {
   const book = allBooks.find((b) => b.id === parseInt(req.params.id));
-
-  //   if (!book) {
-  //     res.status(404).json({ message: "Not Availabe" });
-  //   }
-  book.status = req.body.status;
+  if (!book) {
+    return res.status(404).json({ message: "This book is not available" });
+  }
+  book.name = req.body.name || book.name;
+  book.author = req.body.author || book.author;
+  book.status = req.body.status || book.status;
   res.status(201).json({ message: "Updated successful", book });
 });
-
 export default LibraryRoutes;
