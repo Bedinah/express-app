@@ -4,7 +4,7 @@ import Fruit from "../models/fruits.js";
 // Syncs the model to the database — creates the "Fruits" table if it doesn't exist.
 // WARNING: force: true drops and recreates the table on every restart.
 // This is fine for learning. Never use it on a real production database.
-sequelize.sync({ force: true }).then(() => {
+sequelize.sync({ }).then(() => {
   console.log("Fruits table is ready.");
 });
 // -------------------------------------------------------
